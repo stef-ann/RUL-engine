@@ -29,7 +29,83 @@ Run `features.ipynb` first, then `main.ipynb`. Sections 9–11 of `main.ipynb` r
 
 ## Data
 
-Each row is one flight, with 24 measurements: three operating settings (altitude, Mach number, throttle) and 21 sensors (Power Setting (TRA), T2 Total temperature at fan inlet °R, T24 Total temperature at LPC outlet °R, T30 Total temperature at HPC outlet °R, T50 Total temperature at LPT outlet °R, P2 Pressure at fan inlet psia, P15 Total pressure in bypass-duct psia, P30 Total pressure at HPC outlet psia, Nf Physical fan speed rpm, Nc Physical core speed rpm, epr Engine pressure ratio (P50/P2) --, Ps30 Static pressure at HPC outlet psia,phi Ratio of fuel flow to Ps30 pps/psi, NRf Corrected fan speed rpm, NRc Corrected core speed rpm, BPR Bypass Ratio --, farB Burner fuel-air ratio --, htBleed (Bleed Enthalpy), Nf_dmd Demanded fan speed rpm, PCNfR_dmd Demanded corrected fan speed rpm, W31 HPT coolant bleed lbm/s, W32 LPT coolant bleed lbm/s, and Regime) covering temperatures, pressures, spool speeds and bleed flows. Every flight is flown in one of six operating regimes.
+Each row is one flight: a snapshot of 24 measurements plus a label for the operating regime the flight was flown in.
+
+### Raw readings
+
+Air passes through the engine in this order, and the station numbers in the sensor names mark where each reading is taken:
+
+**fan inlet (2) → low-pressure compressor (LPC, outlet 24) → high-pressure compressor (HPC, outlet 30) → burner → high-pressure turbine (HPT) → low-pressure turbine (LPT, outlet 50)**. Part of the fan's air bypasses the core through the bypass duct (15).
+
+The **Status** column shows how each reading is used in this project, as explained in [Feature selection](#feature-selection).
+
+**Operating settings:** describe the flight condition, not the engine.
+
+| # | Name | Measurement | Unit | Status |
+|---|---|---|---|---|
+| 1 | Altitude | Flight altitude | thousand ft | Defines the regime |
+| 2 | Mach # | Flight speed as a Mach number | – | Defines the regime |
+| 3 | Power Setting (TRA) | Throttle setting (throttle resolver angle) | – | Defines the regime |
+
+**Temperatures**
+
+| # | Name | Measurement | Unit | Status |
+|---|---|---|---|---|
+| 4 | T2 | Total temperature at fan inlet | °R | Constant within a regime |
+| 5 | T24 | Total temperature at LPC outlet | °R | **Selected** |
+| 6 | T30 | Total temperature at HPC outlet | °R | **Selected** |
+| 7 | T50 | Total temperature at LPT outlet | °R | **Selected** |
+
+**Pressures**
+
+| # | Name | Measurement | Unit | Status |
+|---|---|---|---|---|
+| 8 | P2 | Pressure at fan inlet | psia | Constant within a regime |
+| 9 | P15 | Total pressure in bypass duct | psia | Weak trend |
+| 10 | P30 | Total pressure at HPC outlet | psia | Trends with wear, below cut-off |
+| 13 | epr | Engine pressure ratio (P50/P2) | – | Almost no trend |
+| 14 | Ps30 | Static pressure at HPC outlet | psia | **Selected** |
+
+**Shaft speeds**
+
+| # | Name | Measurement | Unit | Status |
+|---|---|---|---|---|
+| 11 | Nf | Physical fan speed | rpm | Excluded: inconsistent across engines |
+| 12 | Nc | Physical core speed | rpm | Excluded: inconsistent across engines |
+| 16 | NRf | Corrected fan speed | rpm | Excluded: inconsistent across engines |
+| 17 | NRc | Corrected core speed | rpm | Excluded: inconsistent across engines |
+| 21 | Nf_dmd | Demanded fan speed | rpm | Constant within a regime |
+| 22 | PCNfR_dmd | Demanded corrected fan speed | rpm | Constant within a regime |
+
+**Ratios, flows and bleed**
+
+| # | Name | Measurement | Unit | Status |
+|---|---|---|---|---|
+| 15 | phi | Ratio of fuel flow to Ps30 | pps/psi | Trends with wear, below cut-off |
+| 18 | BPR | Bypass ratio | – | **Selected** |
+| 19 | farB | Burner fuel-air ratio | – | Weak trend |
+| 20 | htBleed | Bleed enthalpy | – | **Selected** |
+| 23 | W31 | HPT coolant bleed | lbm/s | Trends with wear, below cut-off |
+| 24 | W32 | LPT coolant bleed | lbm/s | Trends with wear, below cut-off |
+
+`#` is the column order in the original data files. Units are as given in the project brief, except altitude, which the brief leaves unlabeled; its values (0–42) match thousands of feet. °R is degrees Rankine, psia is pounds per square inch absolute, pps is pounds per second, and "–" means dimensionless or not stated.
+
+### Operating regimes
+
+Each flight carries a regime label from 1 to 6, set by the three operating settings. Within a regime, each setting varies by 0.01 or less.
+
+| Regime | Altitude (thousand ft) | Mach | Power setting (TRA) | Share of training flights |
+|---|---|---|---|---|
+| 1 | 0 | 0.00 | 100 | 15% |
+| 2 | 10 | 0.25 | 100 | 15% |
+| 3 | 20 | 0.70 | 100 | 15% |
+| 4 | 25 | 0.62 | 60 | 15% |
+| 5 | 35 | 0.84 | 100 | 15% |
+| 6 | 42 | 0.84 | 100 | 25% |
+
+The regime mix is the same early and late in life, so the regime says nothing about wear on its own.
+
+### Engines
 
 - **Training:** 260 engines, 53,759 flights, each running from new to retirement after 128–378 flights (median 199).
 - **Test:** 100 engines, stopped at 21–367 flights, still in service.
