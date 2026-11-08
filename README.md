@@ -29,7 +29,7 @@ Run `features.ipynb` first, then `main.ipynb`. Sections 9–11 of `main.ipynb` r
 
 ## Data
 
-Each row is one flight, with 24 measurements: three operating settings (altitude, Mach number, throttle) and 21 sensors covering temperatures, pressures, spool speeds and bleed flows. Every flight is flown in one of six operating regimes.
+Each row is one flight, with 24 measurements: three operating settings (altitude, Mach number, throttle) and 21 sensors (Power Setting (TRA), T2 Total temperature at fan inlet °R, T24 Total temperature at LPC outlet °R, T30 Total temperature at HPC outlet °R, T50 Total temperature at LPT outlet °R, P2 Pressure at fan inlet psia, P15 Total pressure in bypass-duct psia, P30 Total pressure at HPC outlet psia, Nf Physical fan speed rpm, Nc Physical core speed rpm, epr Engine pressure ratio (P50/P2) --, Ps30 Static pressure at HPC outlet psia,phi Ratio of fuel flow to Ps30 pps/psi, NRf Corrected fan speed rpm, NRc Corrected core speed rpm, BPR Bypass Ratio --, farB Burner fuel-air ratio --, htBleed (Bleed Enthalpy), Nf_dmd Demanded fan speed rpm, PCNfR_dmd Demanded corrected fan speed rpm, W31 HPT coolant bleed lbm/s, W32 LPT coolant bleed lbm/s, and Regime) covering temperatures, pressures, spool speeds and bleed flows. Every flight is flown in one of six operating regimes.
 
 - **Training:** 260 engines, 53,759 flights, each running from new to retirement after 128–378 flights (median 199).
 - **Test:** 100 engines, stopped at 21–367 flights, still in service.
